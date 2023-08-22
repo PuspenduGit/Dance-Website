@@ -1,0 +1,15 @@
+extends base.pug
+
+block scripts
+    script(src="/public/script.js")
+
+block styles
+    style 
+        include ../public/style.css
+        include ../public/styleService.css
+
+block content
+    div.container
+        div#service
+            h2 Service
+            p Services not available right now
