@@ -1,10 +1,25 @@
-import { randomInt } from 'crypto';
 import express from 'express';
-import fs from 'fs';
 import path from 'path';
+import mongoose from 'mongoose';
+import bodyparser from 'body-parser';
 
 const app = express();
 const port = 8080;
+
+mongoose.connect('mongodb://localhost:27017/DanceContact', {
+  useNewUrlParser: true, 
+  useUnifiedTopology: true
+});
+
+const contactSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  phone: String,
+  address: String,
+  desc: String
+});
+
+var contactInfo  = mongoose.model('Contact', contactSchema);
 
 app.use('/public', express.static('public'));
 app.use(express.urlencoded({ extended: true }));
@@ -35,22 +50,20 @@ app.get("/service", (req, res) => {
 });
 
 app.post("/contact", (req, res) => {
-  let name = req.body.name;
-  let email = req.body.email;
-  let phone = req.body.phone;
-  let address = req.body.address;
-  let desc = req.body.description;
 
-  let count = randomInt(1000000000);
+  let contact = new contactInfo({
+    name: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    address: req.body.address,
+    desc: req.body.desc
+  });
 
-  let outputToWrite = `The name of the client is ${name}, ${email}, ${phone}, ${address}, ${desc}`;
-
-  fs.writeFileSync(`output${count}.txt`, outputToWrite);
-
-  const params = {
-    message: "Your form has been submitted successfully",
-  };
-  res.status(200).render("contact", params);
+  contact.save().then(() => {
+    res.status(200).send("Your form has been submitted successfully");
+  }).catch(() => {
+    res.status(400).send("Your form has not been submitted successfully");
+  });
 });
 
 app.listen(port, () => {
