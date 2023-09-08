@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import mongoose from 'mongoose';
-import bodyparser from 'body-parser';
 
 const app = express();
 const port = 8080;
